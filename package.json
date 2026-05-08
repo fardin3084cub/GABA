@@ -1,0 +1,27 @@
+{
+  "name": "gaba-ai",
+  "version": "4.0.0",
+  "description": "GABA - Generative AI Brain Assistant with multi-model support",
+  "private": true,
+  "scripts": {
+    "dev": "python main.py",
+    "start": "python main.py"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  },
+  "keywords": [
+    "ai",
+    "chat",
+    "assistant",
+    "flask",
+    "multi-model",
+    "llm"
+  ],
+  "author": "Arman",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fardin3084cub/GABA.git"
+  }
+}

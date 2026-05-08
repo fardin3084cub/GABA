@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GABA — Your AI Brain</title>
+  <meta name="description" content="GABA - A fast, multi-model AI chat assistant with Groq, OpenAI, Claude, Gemini, and DeepSeek support">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  
+  <!-- Vercel Web Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body class="state-welcome">
+  
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="sidebar-inner">
+      <!-- Brand -->
+      <div class="sidebar-brand">
+        <div class="logo-mark">⚡</div>
+        <div class="brand-text">
+          <span class="brand-name">GABA</span>
+          <span class="brand-sub">AI Brain</span>
+        </div>
+      </div>
+
+      <!-- New Chat Button -->
+      <button class="new-chat-btn" onclick="newChat()">
+        <span>✨</span> New Conversation
+      </button>
+
+      <!-- History Panel -->
+      <div id="histPanel" class="hist-panel">
+        <div class="hist-header">Recent Chats</div>
+        <div id="histList" class="hist-list"></div>
+      </div>
+
+      <!-- Account Nav Button -->
+      <button id="accountNavBtn" class="account-nav-btn" onclick="openAuthModal()">
+        <span>👤</span> Account
+      </button>
+
+      <!-- Creator Card -->
+      <div class="creator-card">
+        <div class="creator-label">Built by</div>
+        <a href="https://portfolioofarman.netlify.app" target="_blank" rel="noopener" class="creator-link">
+          Arman
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Sidebar Overlay (Mobile) -->
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- Header -->
+    <header class="app-header">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="header-status">
+        <div class="status-chip">
+          <span class="status-dot"></span>
+          <span id="chipLabel">—</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Welcome View -->
+    <div class="welcome-view">
+      <div class="hero-section">
+        <div class="hero-logo">⚡</div>
+        <h1 class="hero-title">Welcome to GABA</h1>
+        <p class="hero-subtitle">Your Generative AI Brain Assistant</p>
+      </div>
+
+      <!-- Suggestion Cards -->
+      <div class="suggestion-grid">
+        <button class="suggestion-card" onclick="fillPrompt('Explain quantum computing in simple terms')">
+          <span class="sug-icon">🔬</span>
+          <span class="sug-text">Explain quantum computing</span>
+        </button>
+        <button class="suggestion-card" onclick="fillPrompt('Write a creative story about space exploration')">
+          <span class="sug-icon">🚀</span>
+          <span class="sug-text">Creative story</span>
+        </button>
+        <button class="suggestion-card" onclick="fillPrompt('Help me debug this Python code')">
+          <span class="sug-icon">💻</span>
+          <span class="sug-text">Code debugging</span>
+        </button>
+        <button class="suggestion-card" onclick="fillPrompt('Search for latest AI news')">
+          <span class="sug-icon">🔍</span>
+          <span class="sug-text">Web search</span>
+        </button>
+      </div>
+
+      <!-- Capabilities -->
+      <div class="capability-strip">
+        <div class="cap-item">
+          <span class="cap-icon">🧠</span>
+          <span>Multi-Model AI</span>
+        </div>
+        <div class="cap-item">
+          <span class="cap-icon">🌐</span>
+          <span>Web Search</span>
+        </div>
+        <div class="cap-item">
+          <span class="cap-icon">🔒</span>
+          <span>Safe & Secure</span>
+        </div>
+        <div class="cap-item">
+          <span class="cap-icon">⚡</span>
+          <span>Lightning Fast</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat View -->
+    <div id="chatView" class="chat-view">
+      <div id="messages" class="messages-container"></div>
+      
+      <!-- Typing Indicator -->
+      <div id="typingBar" class="typing-bar">
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span id="msText">Thinking...</span>
+      </div>
+    </div>
+
+    <!-- Composer -->
+    <div class="composer-container">
+      <div class="composer">
+        <button class="composer-btn" title="Attach file (coming soon)" disabled>
+          <span>📎</span>
+        </button>
+        <button class="composer-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice input">
+          <span>🎤</span>
+        </button>
+        <textarea 
+          id="userInput" 
+          class="composer-input" 
+          placeholder="Ask GABA anything..."
+          rows="1"
+        ></textarea>
+        <button id="sendBtn" class="send-btn" onclick="sendMessage()">
+          <span>→</span>
+        </button>
+      </div>
+      <div class="composer-footer">
+        <span id="charCount">0</span> characters
+        <span id="voiceHint" class="voice-hint" style="display:none;">🎤 Listening...</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeAuthModal()">×</button>
+      
+      <!-- Logged Out View -->
+      <div id="authFormSection">
+        <h2 class="modal-title">Account</h2>
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+          <button class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+        </div>
+        
+        <div class="auth-form">
+          <input type="email" id="authEmail" placeholder="Email" class="auth-input">
+          <input type="password" id="authPassword" placeholder="Password" class="auth-input">
+          <button class="auth-submit-btn" onclick="handleAuth()">Continue</button>
+          <div id="authErr" class="auth-err"></div>
+        </div>
+      </div>
+
+      <!-- Logged In View -->
+      <div id="authLoggedSection" style="display:none;">
+        <h2 class="modal-title">Account</h2>
+        <div class="auth-logged">
+          <div class="auth-avatar">👤</div>
+          <div id="authEmailDisplay" class="auth-email-display"></div>
+          <button class="auth-logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+        <div id="authStatusMsg" class="auth-status-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="adminPanel" class="admin-panel">
+    <div class="admin-overlay" onclick="closeAdminPanel()"></div>
+    <div class="admin-content">
+      
+      <!-- Admin Login Screen -->
+      <div id="adminLoginSection">
+        <div class="admin-login-card">
+          <div class="admin-lock-icon">🔒</div>
+          <h2>Admin Access</h2>
+          <input type="password" id="adminPwdInp" placeholder="Admin password" class="admin-input">
+          <button class="admin-login-btn" onclick="adminLogin()">Login</button>
+          <div id="adminLoginErr" class="admin-err"></div>
+        </div>
+      </div>
+
+      <!-- Admin Main Content -->
+      <div id="adminMainSection" style="display:none;">
+        <div class="admin-header">
+          <h2>Admin Console</h2>
+          <button class="admin-close-btn" onclick="closeAdminPanel()">×</button>
+        </div>
+
+        <!-- Admin Tabs -->
+        <div id="adminTabs" class="admin-tabs">
+          <button class="atab active" data-tab="dashboard">Dashboard</button>
+          <button class="atab" data-tab="keys">Keys</button>
+          <button class="atab" data-tab="providers">Providers</button>
+          <button class="atab" data-tab="settings">Settings</button>
+          <button class="atab" data-tab="prompt">Prompt</button>
+          <button class="atab" data-tab="users">Users</button>
+          <button class="atab" data-tab="chats">Chats</button>
+          <button class="atab" data-tab="backup">Backup</button>
+          <button class="atab" data-tab="password">Password</button>
+        </div>
+
+        <!-- Admin Tab Content -->
+        <div id="adminTabContent" class="admin-tab-content">
+          <!-- Tab content will be dynamically loaded by script.js -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Hidden Elements for Admin Panel -->
+  <div style="display:none;">
+    <!-- Provider Order List -->
+    <div id="provOrderList"></div>
+    
+    <!-- System Prompt Editor -->
+    <textarea id="sysPromptEditor"></textarea>
+    
+    <!-- Settings Inputs -->
+    <input type="checkbox" id="setWebSearch">
+    <input type="checkbox" id="setSignupOpen">
+    <input type="number" id="setRateLimit">
+    
+    <!-- New Key Inputs -->
+    <input type="text" id="newKeyProv">
+    <input type="text" id="newKeyVal">
+    
+    <!-- New Admin Password -->
+    <input type="password" id="newAdminPwd">
+    
+    <!-- Search Inputs -->
+    <input type="text" id="userSearchInp">
+    <input type="text" id="chatSearchInp">
+    
+    <!-- Results Containers -->
+    <div id="userResults"></div>
+    <div id="chatResults"></div>
+    
+    <!-- Backup Output -->
+    <div id="backupOut"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
