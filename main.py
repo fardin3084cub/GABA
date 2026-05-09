@@ -10,14 +10,8 @@ from flask_cors import CORS
 from supabase import create_client, Client
 import requests as req
 
-import pathlib
-BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
-
-app = Flask(__name__, 
-            template_folder=str(BASE_DIR / "templates"),
-            static_folder=str(BASE_DIR / "public"),
-            static_url_path="")
-app.secret_key = os.environ.get("FLASK_SECRET", "gaba-secret-key-change-in-production")
+app = Flask(__name__, template_folder="templates")
+app.secret_key = os.environ.get("FLASK_SECRET", os.urandom(32))
 CORS(app, supports_credentials=True, origins="*")
 
 # ── Supabase ──────────────────────────────────────────────────────
