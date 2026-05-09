@@ -10,7 +10,7 @@ from flask_cors import CORS
 from supabase import create_client, Client
 import requests as req
 
-app = Flask(__name__, template_folder="template")
+app = Flask(__name__, template_folder="templates")
 app.secret_key = os.environ.get("FLASK_SECRET", os.urandom(32))
 CORS(app, supports_credentials=True, origins="*")
 
@@ -304,7 +304,7 @@ def chat():
 def home():
     return render_template("index.html")
 
-# ── Admin login ───────────────────────────────────────────────────
+# ── Admin login ───────────────────���───────────────────────────────
 @app.route("/admin/login", methods=["POST"])
 def admin_login():
     pwd = (request.json or {}).get("password", "")
