@@ -1,1 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GABA — Generative AI Brain Assistant</title>
+  <meta name="description" content="GABA is a powerful AI assistant built by Arman. Chat with multiple LLMs including GPT-4, Claude, Gemini, and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="state-welcome">
+  <!-- Background Effects -->
+  <div class="grid-overlay"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
 
+  <!-- App Shell -->
+  <div class="app-shell">
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-inner">
+        <!-- Brand -->
+        <div class="brand">
+          <div class="brand-icon">⚡</div>
+          <div class="brand-text">
+            <span class="brand-name">GABA</span>
+            <span class="brand-tag">v4.0</span>
+          </div>
+        </div>
+
+        <!-- New Chat Button -->
+        <button class="new-chat-btn" onclick="newChat()">
+          <span class="btn-icon">+</span>
+          <span>New Chat</span>
+        </button>
+
+        <!-- History Panel Toggle -->
+        <button class="nav-btn" onclick="toggleHistoryPanel()">
+          <span>📂</span>
+          <span>History</span>
+        </button>
+
+        <!-- History Panel -->
+        <div id="histPanel" class="hist-panel">
+          <div id="histList" class="hist-list"></div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+          <button id="accountNavBtn" class="nav-btn" onclick="openAuthModal()">
+            <span>👤</span>
+            <span>Account</span>
+          </button>
+          <button class="nav-btn" onclick="openExportModal()">
+            <span>📥</span>
+            <span>Export Chat</span>
+          </button>
+          <button class="nav-btn" onclick="clearChat()">
+            <span>🗑️</span>
+            <span>Clear Chat</span>
+          </button>
+        </nav>
+
+        <!-- Footer -->
+        <div class="sidebar-footer">
+          <a href="https://portfolioofarman.netlify.app" target="_blank" rel="noopener">Built by Arman</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="top-bar-center">
+          <span id="chipLabel" class="chip">—</span>
+          <span id="msText" class="ms-text">Ready</span>
+        </div>
+        <div class="top-bar-right">
+          <span id="voiceHint" class="voice-hint"></span>
+        </div>
+      </header>
+
+      <!-- Chat View -->
+      <div id="chatView" class="chat-view">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen">
+          <div class="welcome-icon">⚡</div>
+          <h1 class="welcome-title">GABA</h1>
+          <p class="welcome-subtitle">Generative AI Brain Assistant</p>
+          <p class="welcome-desc">Powered by multiple AI providers with automatic fallback</p>
+          
+          <div class="suggestions">
+            <button class="suggestion-btn" onclick="useSuggestion('Explain quantum computing in simple terms')">
+              Explain quantum computing
+            </button>
+            <button class="suggestion-btn" onclick="useSuggestion('Write a Python function to sort a list')">
+              Write Python code
+            </button>
+            <button class="suggestion-btn" onclick="useSuggestion('What are the latest trends in AI?')">
+              Latest AI trends
+            </button>
+            <button class="suggestion-btn" onclick="useSuggestion('Help me write a professional email')">
+              Professional email help
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages Container -->
+        <div id="messages" class="messages"></div>
+
+        <!-- Typing Indicator -->
+        <div id="typingBar" class="typing-bar">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <span>GABA is thinking...</span>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="input-area">
+        <div class="input-wrapper">
+          <textarea 
+            id="userInput" 
+            class="user-input" 
+            placeholder="Ask anything..." 
+            rows="1"
+            maxlength="8000"
+          ></textarea>
+          <div class="input-actions">
+            <span id="charCount" class="char-count">0</span>
+            <button class="voice-btn" onclick="startVoice()" title="Voice input">🎤</button>
+            <button id="sendBtn" class="send-btn" onclick="sendMessage()">
+              <span class="send-icon">➤</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeAuthModal()">×</button>
+      <h2 class="modal-title">Account</h2>
+      <p id="authStatusMsg" class="auth-status">Sign in to save conversations.</p>
+      
+      <div id="authFormSection" class="auth-form-section">
+        <input type="email" id="authEmail" class="auth-input" placeholder="Email">
+        <input type="password" id="authPassword" class="auth-input" placeholder="Password">
+        <p id="authErr" class="auth-error"></p>
+        <div class="auth-btns">
+          <button class="auth-btn primary" onclick="doLogin()">Sign In</button>
+          <button class="auth-btn secondary" onclick="doSignup()">Sign Up</button>
+        </div>
+      </div>
+      
+      <div id="authLoggedSection" class="auth-logged-section" style="display:none">
+        <p class="auth-email">Signed in as: <strong id="authEmailDisplay"></strong></p>
+        <button class="auth-btn secondary" onclick="doLogout()">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="adminPanel" class="admin-panel">
+    <div class="admin-header">
+      <h2>Admin Panel</h2>
+      <button class="modal-close" onclick="closeAdmin()">×</button>
+    </div>
+    
+    <div id="adminLoginSection" class="admin-login-section">
+      <input type="password" id="adminPwdInp" class="auth-input" placeholder="Admin Password">
+      <p id="adminLoginErr" class="auth-error"></p>
+      <button class="auth-btn primary" onclick="attemptAdminLogin()">Login</button>
+    </div>
+    
+    <div id="adminTabs" class="admin-tabs" style="display:none">
+      <button class="atab active" data-tab="dashboard">Dashboard</button>
+      <button class="atab" data-tab="keys">API Keys</button>
+      <button class="atab" data-tab="providers">Providers</button>
+      <button class="atab" data-tab="settings">Settings</button>
+      <button class="atab" data-tab="prompt">Prompt</button>
+      <button class="atab" data-tab="users">Users</button>
+      <button class="atab" data-tab="chats">Chats</button>
+      <button class="atab" data-tab="backup">Backup</button>
+    </div>
+    
+    <div id="adminMainSection" class="admin-main-section" style="display:none">
+      <div id="adminTabContent" class="admin-tab-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="/script.js"></script>
+</body>
+</html>
